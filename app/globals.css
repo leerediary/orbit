@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f5f5f7;
+  --foreground: #1d1d1f;
+  --accent: #0066cc;
+  --border: #e5e5e5;
+  --muted: #6e6e73;
+  --card: #ffffff;
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #000000;
+    --foreground: #f5f5f7;
+    /* Apple's dark-mode link blue — #0066cc is only ~3.8:1 on #000 (fails AA). */
+    --accent: #2997ff;
+    --border: #2a2a2a;
+    --muted: #86868b;
+    --card: #1c1c1e;
+    --card-shadow: none;
+  }
+}
+
+/* CSS-level pinch-zoom disable (works even on modern iOS WebKit which no
+   longer honors user-scalable=no consistently). Allows pan-x/pan-y so normal
+   scrolling works; child elements with touch-action: none override locally. */
+html {
+  touch-action: pan-x pan-y;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+  font-size: 17px;
+  line-height: 1.47;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  /* Full-bleed nav/milestone rows extend to 100vw; clip prevents a stray
+     horizontal scrollbar when the vertical scrollbar is present. */
+  overflow-x: clip;
+}
+
+/* Milestone summary card width is fixed in viewport units so four cards fill
+   the centered content column, and the size does NOT change when the scroll
+   row breaks out to the viewport's right edge (Apple full-bleed pattern).
+   Formula: (content width - 3 gaps of 12px) / 4, where content width is
+   100vw - 48px (mobile) or 75vw - 48px (desktop md:max-w-[75%] + px-6). */
+.milestone-summary-card {
+  flex: 0 0 calc(25vw - 21px);
+}
+@media (min-width: 768px) {
+  .milestone-summary-card {
+    flex: 0 0 calc(18.75vw - 21px);
+  }
+}
+
+/* Hide the scrollbar on horizontal card rows while keeping scrollable. */
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
