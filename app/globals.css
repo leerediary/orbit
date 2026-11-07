@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f5f5f7;
+  --foreground: #1d1d1f;
+  --accent: #0066cc;
+  --accent-hover: #1a7fd6;
+  --border: #e5e5e5;
+  --muted: #6e6e73;
+  --card: #ffffff;
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.04);
+  /* Phase 20 — destructive actions use text/outline only, never a fill. */
+  --destructive: #d70015;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #000000;
+    --foreground: #f5f5f7;
+    /* Apple's dark-mode link blue — #0066cc is only ~3.8:1 on #000 (fails AA). */
+    --accent: #2997ff;
+    --accent-hover: #4dabff;
+    --border: #2a2a2a;
+    --muted: #86868b;
+    --card: #1c1c1e;
+    --card-shadow: none;
+    --destructive: #ff453a;
+  }
+}
+
+/* Phase 20 bootstrap modal motion — scrim fade + sheet rise, disabled when the
+   user asks for reduced motion. No other animation is added by this phase. */
+@keyframes orbit-bootstrap-scrim-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes orbit-bootstrap-sheet-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.orbit-bootstrap-scrim {
+  animation: orbit-bootstrap-scrim-in 150ms ease-out both;
+}
+.orbit-bootstrap-sheet {
+  animation: orbit-bootstrap-sheet-in 200ms ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .orbit-bootstrap-scrim,
+  .orbit-bootstrap-sheet {
+    animation: none !important;
+  }
+}
+
+/* CSS-level pinch-zoom disable (works even on modern iOS WebKit which no
+   longer honors user-scalable=no consistently). Allows pan-x/pan-y so normal
+   scrolling works; child elements with touch-action: none override locally. */
+html {
+  touch-action: pan-x pan-y;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+  font-size: 17px;
+  line-height: 1.47;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  /* Full-bleed nav/milestone rows extend to 100vw; clip prevents a stray
+     horizontal scrollbar when the vertical scrollbar is present. */
+  overflow-x: clip;
+}
+
+/* Goal summary card width is fixed in viewport units so four cards fill
+   the centered content column, and the size does NOT change when the scroll
+   row breaks out to the viewport's right edge (Apple full-bleed pattern).
+   Formula: (content width - 3 gaps of 12px) / 4, where content width is
+   100vw - 48px (mobile) or 75vw - 48px (desktop md:max-w-[75%] + px-6). */
+.goal-summary-card {
+  flex: 0 0 calc(25vw - 21px);
+}
+@media (min-width: 768px) {
+  .goal-summary-card {
+    flex: 0 0 calc(18.75vw - 21px);
+  }
+}
+
+/* Hide the scrollbar on horizontal card rows while keeping scrollable. */
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Filled blue primary button (rounded rectangle, white text). Hover brightens
+   the fill; disabled dims it. Font size is overridden inline where a compact
+   variant is needed (e.g. the 15px ＋ 添加). */
+.primary-button {
+  min-height: 44px;
+  padding: 0 16px;
+  background: var(--accent);
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.47;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 120ms ease-out;
+}
+.primary-button:hover {
+  background: var(--accent-hover);
+}
+.primary-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* Accent (blue text) button: underline on hover as instant feedback. */
+.accent-button:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Text buttons with a leading glyph (e.g. "+ 添加今日目标" / "+ 添加笔记"):
+   hover underline sits under the label only, never under the glyph.
+   UI design rule, 2026-11-01. */
+.accent-button-glyph:hover .accent-button-glyph__label {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Remove all blue (accent) focus outlines globally — buttons, inputs, and
+   checkbox-row labels — so no focus frame paints a blue box anywhere. */
+:focus-visible,
+:has(:focus-visible) {
+  outline: none !important;
+}

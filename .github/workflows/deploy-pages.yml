@@ -1,0 +1,64 @@
+# Deploy the statically-exported build to GitHub Pages under /orbit.
+# Anonymous mirror (leerediary/orbit): subpath deploy, no personal identity.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - uses: actions/configure-pages@v5
+        id: configure_pages
+
+      - uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}
+
+      # npm install (not npm ci): matches the diary-web mirror's proven setup —
+      # npm ci has historically hung in GitHub Actions for this dependency set.
+      - name: Install dependencies
+        run: npm install
+
+      # Test gate BEFORE build — a failure here stops the deploy.
+      - name: Run tests
+        run: npm test
+
+      - name: Build static export
+        run: npm run build
+        env:
+          NEXT_PUBLIC_BASE_PATH: /orbit
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./out
+
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/deploy-pages@v5
+        id: deployment
